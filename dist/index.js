@@ -2722,6 +2722,107 @@ exports["default"] = _default;
 
 /***/ }),
 
+/***/ 498:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getCurrentVersion = void 0;
+const core = __importStar(__nccwpck_require__(186));
+async function getCurrentVersion(token) {
+    const org = core.getInput('org');
+    const packageName = core.getInput('packageName');
+    const response = await fetch(`https://api.github.com/orgs/${org}/packages/nuget/${packageName}/versions`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    const body = await response.json();
+    if (body.length === 0) {
+        return '';
+    }
+    return body[0].name;
+}
+exports.getCurrentVersion = getCurrentVersion;
+
+
+/***/ }),
+
+/***/ 965:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getNextVersion = void 0;
+function incrementBetaVersion(currentVersion) {
+    const versionParts = currentVersion.split('-beta.');
+    const version = versionParts[0];
+    const betaVersion = versionParts[1];
+    const betaNumber = parseInt(betaVersion);
+    const nextBetaNumber = betaNumber + 1;
+    return `${version}-beta.${nextBetaNumber}`;
+}
+function incrementPatchVersion(currentVersion) {
+    const versionParts = currentVersion.split('.');
+    const major = versionParts[0];
+    const minor = versionParts[1];
+    const patch = versionParts[2];
+    const patchNumber = parseInt(patch);
+    const nextPatchNumber = patchNumber + 1;
+    return `${major}.${minor}.${nextPatchNumber}`;
+}
+function getNextVersion(currentVersion, publishBeta) {
+    if (publishBeta) {
+        if (currentVersion.includes('-beta')) {
+            console.log(`Incrementing beta version from last beta version ${currentVersion}`);
+            return incrementBetaVersion(currentVersion);
+        }
+        else {
+            const nextMainVersion = incrementPatchVersion(currentVersion);
+            console.log(`Incrementing main version to ${nextMainVersion} from ${currentVersion} and adding beta.1`);
+            return `${nextMainVersion}-beta.1`;
+        }
+    }
+    else {
+        if (currentVersion.includes('-beta')) {
+            console.log(`Publish main version from last beta version ${currentVersion}`);
+            return currentVersion.split('-beta')[0];
+        }
+        else {
+            console.log(`Incrementing patch version from last main version ${currentVersion}`);
+            return incrementPatchVersion(currentVersion);
+        }
+    }
+}
+exports.getNextVersion = getNextVersion;
+
+
+/***/ }),
+
 /***/ 399:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -2753,24 +2854,44 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(186));
+const get_next_version_1 = __nccwpck_require__(965);
+const get_current_version_1 = __nccwpck_require__(498);
+function setFirstVersion(mainVersion, minorVersion, publishBeta) {
+    const nextVersion = `${mainVersion}.${minorVersion}.0`;
+    if (publishBeta) {
+        core.setOutput('version', `${nextVersion}-beta.1`);
+        return;
+    }
+    core.setOutput('version', nextVersion);
+}
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 async function run() {
     try {
-        const org = core.getInput('org');
-        const packageName = core.getInput('packageName');
         const token = process.env.GITHUB_TOKEN;
         if (token === undefined) {
-            throw new Error('GITHUB_TOKEN not set');
+            throw new Error(`GITHUB_TOKEN not set, please set the GITHUB_TOKEN environment variable to secrets.GITHUB_TOKEN`);
         }
-        const response = await fetch(`https://api.github.com/orgs/${org}/packages/nuget/${packageName}/versions`, {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        const body = await response.json();
-        console.log(body[0].name);
+        const minorVersion = core.getInput('minorVersion');
+        const mainVersion = core.getInput('mainVersion');
+        const publishBeta = core.getInput('publishBeta').toLowerCase() === 'true';
+        const currentVersion = await (0, get_current_version_1.getCurrentVersion)(token);
+        if (currentVersion === '') {
+            console.log(`No current version found`);
+            setFirstVersion(mainVersion, minorVersion, publishBeta);
+            return;
+        }
+        const currentVersionParts = currentVersion.split('.');
+        if (currentVersionParts[0] !== mainVersion ||
+            currentVersionParts[1] !== minorVersion) {
+            console.log(`Current version ${currentVersion} does not match main version ${mainVersion} or minor version ${minorVersion}`);
+            setFirstVersion(mainVersion, minorVersion, publishBeta);
+            return;
+        }
+        const nextVersion = (0, get_next_version_1.getNextVersion)(currentVersion, publishBeta);
+        core.setOutput('version', nextVersion);
     }
     catch (error) {
         // Fail the workflow run if an error occurs

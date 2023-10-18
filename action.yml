@@ -10,6 +10,18 @@ inputs:
   packageName:
     description: 'Package name'
     required: true
+  publishBeta:
+    description: 'Is beta version'
+    required: false
+    default: 'false'
+  mainVersion:
+    description: 'Main version'
+    required: false
+    default: '1'
+  minorVersion:
+    description: 'Minor version'
+    required: false
+    default: '0'
 
 # Define your outputs here.
 outputs:
