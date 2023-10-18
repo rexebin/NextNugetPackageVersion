@@ -15,7 +15,7 @@ This github action calls GitHub API `https://api.github.com/orgs/${org}/packages
 |---------|------|----|----|-|-
 |1|0|''|true|1.0.0-beta.1| first version
 |1|0|''|false|1.0.0|first version
-|1|0|'1.0.1'|true|1.0.2.beta.1| create beta 1 from next patch version
+|1|0|'1.0.1'|true|1.0.2.beta.1| create beta 1 for next patch version
 |1|0|'1.0.1'|false|1.0.2| increment patch version
 |1|0|'1.0.1.beta.1'|true|1.0.1.beta.2| increment beta version
 |1|0|'1.0.1.beta.1'|false|1.0.1| create next version from beta
