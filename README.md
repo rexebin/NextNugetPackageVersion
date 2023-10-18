@@ -1,6 +1,5 @@
-# Github Action for calculate next nuget version from Github Packages
+# GitHub Action for calculate next nuget version from Github Packages
 
-[![GitHub Super-Linter](https://github.com/rexebin/next-nuget-package-version/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/rexebin/next-nuget-package-version/actions/workflows/ci.yml/badge.svg)
 
 This github action calls GitHub API `https://api.github.com/orgs/${org}/packages/nuget/${packageName}/versions` with `${{ secrets.GITHUB_TOKEN }}`, to get the latest version and calculate the next version number from inputs such as:
@@ -11,7 +10,7 @@ This github action calls GitHub API `https://api.github.com/orgs/${org}/packages
 
 ## Version Calculations
 
-|Main Version|Minor Version|	Last Version|	Publish Beta|	Next Version| Note
+|Main Version|Minor Version|Last Version|Publish Beta|Next Version| Note
 |---------|------|----|----|-|-
 |1|0|''|true|1.0.0-beta.1| first version
 |1|0|''|false|1.0.0|first version
