@@ -2770,7 +2770,9 @@ async function run() {
             headers: { Authorization: `Bearer ${token}` }
         });
         const body = await response.json();
+        console.log(JSON.stringify(body));
         core.debug(JSON.stringify(body));
+        throw new Error(JSON.stringify(body));
     }
     catch (error) {
         // Fail the workflow run if an error occurs
