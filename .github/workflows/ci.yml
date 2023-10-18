@@ -53,7 +53,11 @@ jobs:
         id: test-action
         uses: ./
         with:
-          milliseconds: 1000
+          org: test
+          packageName: test
+          mainVersion: 1
+          minorVersion: 0
+          publishBeta: 'true'
 
       - name: Print Output
         id: output
