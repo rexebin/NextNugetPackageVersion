@@ -2770,7 +2770,7 @@ async function run() {
             headers: { Authorization: `Bearer ${token}` }
         });
         const body = await response.json();
-        console.log(body[0].Name);
+        console.log(body[0].name);
     }
     catch (error) {
         // Fail the workflow run if an error occurs

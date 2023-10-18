@@ -1,8 +1,8 @@
 import * as core from '@actions/core'
 
 interface GithubPackageVersion {
-  Id: string
-  Name: string
+  id: string
+  name: string
 }
 
 /**
@@ -25,7 +25,7 @@ export async function run(): Promise<void> {
       }
     )
     const body: GithubPackageVersion[] = await response.json()
-    console.log(body[0].Name)
+    console.log(body[0].name)
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)
