@@ -10,9 +10,6 @@ inputs:
   packageName:
     description: 'Package name'
     required: true
-  token:
-    description: 'GitHub token'
-    required: true
 
 # Define your outputs here.
 outputs:

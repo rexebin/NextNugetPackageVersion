@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import {environments} from "eslint-plugin-prettier";
 
 interface GithubPackageVersion {
     Id: string;
@@ -13,7 +14,10 @@ export async function run(): Promise<void> {
     try {
         const org: string = core.getInput('org')
         const packageName: string = core.getInput('packageName')
-        const token: string = core.getInput('token')
+        const token: string|undefined = process.env.GITHUB_TOKEN;
+        if (token === undefined) {
+            throw new Error('GITHUB_TOKEN not set')
+        }
         const response: Response = await fetch(`https://api.github.com/orgs/${org}/packages/nuget/${packageName}/versions`, {
             method: 'GET',
             headers: {'Authorization': 'Bearer ' + token}
