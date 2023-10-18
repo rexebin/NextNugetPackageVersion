@@ -18,6 +18,10 @@ export async function getCurrentVersion(token: string): Promise<string> {
   )
   const body: GithubPackageVersion[] = await response.json()
 
+  if (!body) {
+    console.log('failed to get current version')
+    return ''
+  }
   if (body.length === 0) {
     return ''
   }

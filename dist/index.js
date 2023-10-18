@@ -2761,6 +2761,10 @@ async function getCurrentVersion(token) {
         headers: { Authorization: `Bearer ${token}` }
     });
     const body = await response.json();
+    if (!body) {
+        console.log('failed to get current version');
+        return '';
+    }
     if (body.length === 0) {
         return '';
     }
