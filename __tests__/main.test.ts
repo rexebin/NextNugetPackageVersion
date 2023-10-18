@@ -3,7 +3,10 @@ import * as core from '@actions/core'
 
 function mockCurrentVersion(version: string) {
   jest.spyOn(global, 'fetch').mockResolvedValue({
-    json: jest.fn().mockResolvedValue(version === '' ? [] : [{ name: version }])
+    json: jest
+      .fn()
+      .mockResolvedValue(version === '' ? [] : [{ name: version }]),
+    ok: true
   } as any as Promise<Response>)
 }
 

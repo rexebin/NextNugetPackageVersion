@@ -2760,6 +2760,9 @@ async function getCurrentVersion(token) {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` }
     });
+    if (!response.ok) {
+        throw new Error(`Failed to get current version: ${response.statusText}`);
+    }
     const body = await response.json();
     if (body.length === 0) {
         console.log('No current version found');

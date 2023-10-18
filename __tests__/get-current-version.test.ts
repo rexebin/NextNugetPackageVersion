@@ -6,7 +6,10 @@ import { getCurrentVersion } from '../src/get-current-version'
 
 function mockVersion(version: string) {
   jest.spyOn(global, 'fetch').mockResolvedValue({
-    json: jest.fn().mockResolvedValue(version === '' ? [] : [{ name: version }])
+    json: jest
+      .fn()
+      .mockResolvedValue(version === '' ? [] : [{ name: version }]),
+    ok: true
   } as any as Promise<Response>)
 }
 
