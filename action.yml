@@ -1,18 +1,23 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Get Next Nuget Package Version from GitHub'
+description: 'Action for getting Next Nuget Package Version from GitHub'
+author: 'rexebin'
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  org:
+    description: 'Organization name'
     required: true
-    default: '1000'
+  packageName:
+    description: 'Package name'
+    required: true
+  token:
+    description: 'GitHub token'
+    required: true
 
 # Define your outputs here.
 outputs:
-  time:
-    description: 'Your output description here'
+  version:
+    description: 'The version of the package'
 
 runs:
   using: node20
