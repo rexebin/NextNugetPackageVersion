@@ -25,9 +25,7 @@ export async function run(): Promise<void> {
       }
     )
     const body: GithubPackageVersion[] = await response.json()
-    console.log(JSON.stringify(body))
-    core.debug(JSON.stringify(body))
-    throw new Error(JSON.stringify(body))
+    console.log(body[0].Name)
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)
