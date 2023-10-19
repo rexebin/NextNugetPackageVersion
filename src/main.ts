@@ -3,13 +3,11 @@ import { getNextBetaVersion, getNextVersion } from './get-next-version';
 import { getCurrentVersion } from './get-current-version';
 
 function setFirstVersion(mainVersion: string, minorVersion: string) {
-  const nextVersion = `${mainVersion}.${minorVersion}.0`;
-  core.setOutput('version', nextVersion);
+  core.setOutput('version', `${mainVersion}.${minorVersion}.0`);
 }
 
 function setFirstBetaVersion(mainVersion: string, minorVersion: string) {
-  const nextVersion = `${mainVersion}.${minorVersion}.0`;
-  core.setOutput('version', `${nextVersion}-beta.1`);
+  core.setOutput('version', `${mainVersion}.${minorVersion}.0-beta.1`);
 }
 
 /**
@@ -27,8 +25,7 @@ export async function run(): Promise<void> {
     }
     const minorVersion = core.getInput('minorVersion');
     const majorVersion = core.getInput('majorVersion');
-    const publishBeta: boolean =
-      core.getInput('publishBeta').toLowerCase() === 'true';
+    const publishBeta = core.getInput('publishBeta').toLowerCase() === 'true';
 
     const currentVersion = await getCurrentVersion(token);
 
@@ -55,11 +52,9 @@ export async function run(): Promise<void> {
       return;
     }
 
-    if (publishBeta) {
-      core.setOutput('version', getNextBetaVersion(currentVersion));
-      return;
-    }
-    core.setOutput('version', getNextVersion(currentVersion));
+    publishBeta
+      ? core.setOutput('version', getNextBetaVersion(currentVersion))
+      : core.setOutput('version', getNextVersion(currentVersion));
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message);

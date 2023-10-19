@@ -2760,16 +2760,17 @@ async function getCurrentVersion(token) {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` }
     });
+    const notFoundMessage = 'No current version found. If this is not expected, check your org, package name and token.';
     if (!response.ok) {
         if (response.status === 404) {
-            console.log('No current version found');
+            console.log(notFoundMessage);
             return '';
         }
         throw new Error(`Failed to get current version: ${response.statusText}`);
     }
     const body = await response.json();
     if (body.length === 0) {
-        console.log('No current version found');
+        console.log(notFoundMessage);
         return '';
     }
     return body[0]?.name;
@@ -2860,12 +2861,10 @@ const core = __importStar(__nccwpck_require__(186));
 const get_next_version_1 = __nccwpck_require__(965);
 const get_current_version_1 = __nccwpck_require__(498);
 function setFirstVersion(mainVersion, minorVersion) {
-    const nextVersion = `${mainVersion}.${minorVersion}.0`;
-    core.setOutput('version', nextVersion);
+    core.setOutput('version', `${mainVersion}.${minorVersion}.0`);
 }
 function setFirstBetaVersion(mainVersion, minorVersion) {
-    const nextVersion = `${mainVersion}.${minorVersion}.0`;
-    core.setOutput('version', `${nextVersion}-beta.1`);
+    core.setOutput('version', `${mainVersion}.${minorVersion}.0-beta.1`);
 }
 /**
  * The main function for the action.
@@ -2897,11 +2896,9 @@ async function run() {
                 : setFirstVersion(majorVersion, minorVersion);
             return;
         }
-        if (publishBeta) {
-            core.setOutput('version', (0, get_next_version_1.getNextBetaVersion)(currentVersion));
-            return;
-        }
-        core.setOutput('version', (0, get_next_version_1.getNextVersion)(currentVersion));
+        publishBeta
+            ? core.setOutput('version', (0, get_next_version_1.getNextBetaVersion)(currentVersion))
+            : core.setOutput('version', (0, get_next_version_1.getNextVersion)(currentVersion));
     }
     catch (error) {
         // Fail the workflow run if an error occurs

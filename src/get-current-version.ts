@@ -17,9 +17,12 @@ export async function getCurrentVersion(token: string): Promise<string> {
     }
   );
 
+  const notFoundMessage =
+    'No current version found. If this is not expected, check your org, package name and token.';
+
   if (!response.ok) {
     if (response.status === 404) {
-      console.log('No current version found');
+      console.log(notFoundMessage);
       return '';
     }
     throw new Error(`Failed to get current version: ${response.statusText}`);
@@ -27,7 +30,7 @@ export async function getCurrentVersion(token: string): Promise<string> {
 
   const body: GithubPackageVersion[] = await response.json();
   if (body.length === 0) {
-    console.log('No current version found');
+    console.log(notFoundMessage);
     return '';
   }
 
