@@ -1,5 +1,5 @@
-import { run } from '../src/main'
-import * as core from '@actions/core'
+import { run } from '../src/main';
+import * as core from '@actions/core';
 
 function mockCurrentVersion(version: string) {
   jest.spyOn(global, 'fetch').mockResolvedValue({
@@ -7,7 +7,7 @@ function mockCurrentVersion(version: string) {
       .fn()
       .mockResolvedValue(version === '' ? [] : [{ name: version }]),
     ok: true
-  } as any as Promise<Response>)
+  } as any as Promise<Response>);
 }
 
 function mockInputs(
@@ -17,38 +17,47 @@ function mockInputs(
 ) {
   jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
     if (name === 'org') {
-      return 'org'
+      return 'org';
     }
     if (name === 'packageName') {
-      return 'packageName'
+      return 'packageName';
     }
     if (name === 'minorVersion') {
-      return minorVersion
+      return minorVersion;
     }
     if (name === 'mainVersion') {
-      return mainVersion
+      return mainVersion;
     }
     if (name === 'publishBeta') {
-      return publishBeta
+      return publishBeta;
     }
-    throw new Error(`Unexpected input ${name}`)
-  })
+    throw new Error(`Unexpected input ${name}`);
+  });
 }
 
 afterEach(() => {
-  jest.restoreAllMocks()
-})
+  jest.restoreAllMocks();
+});
 
 describe('get current version', () => {
-  const OLD_ENV = process.env
+  const OLD_ENV = process.env;
   beforeEach(() => {
-    jest.resetModules() // Most important - it clears the cache
-    process.env = { ...OLD_ENV, ...{ GITHUB_TOKEN: 'mytoken' } } // Make a copy
-  })
+    jest.resetModules(); // Most important - it clears the cache
+    process.env = { ...OLD_ENV, ...{ GITHUB_TOKEN: 'mytoken' } };
+  });
 
   afterAll(() => {
-    process.env = OLD_ENV // Restore old environment
-  })
+    process.env = OLD_ENV; // Restore old environment
+  });
+
+  it('should throw if no token is given', async () => {
+    process.env = { ...OLD_ENV, ...{ GITHUB_TOKEN: undefined } };
+    jest.spyOn(core, 'setFailed');
+    await run();
+    expect(core.setFailed).toHaveBeenCalledWith(
+      'GITHUB_TOKEN not set, please set the GITHUB_TOKEN environment variable to secrets.GITHUB_TOKEN'
+    );
+  });
 
   describe('when current version is empty', () => {
     it.each([
@@ -60,14 +69,14 @@ describe('get current version', () => {
     ])(
       'when main version is %s, minor version is %s, beta: %s, should return %s',
       async (mainVersion, minorVersion, publishBeta, expectedVersion) => {
-        mockCurrentVersion('')
-        mockInputs(mainVersion, minorVersion, publishBeta)
-        const spy = jest.spyOn(core, 'setOutput')
-        await run()
-        expect(spy).toHaveBeenCalledWith('version', expectedVersion)
+        mockCurrentVersion('');
+        mockInputs(mainVersion, minorVersion, publishBeta);
+        const spy = jest.spyOn(core, 'setOutput');
+        await run();
+        expect(spy).toHaveBeenCalledWith('version', expectedVersion);
       }
-    )
-  })
+    );
+  });
 
   describe('when current version does not match given main or minor version', () => {
     it.each([
@@ -78,14 +87,14 @@ describe('get current version', () => {
     ])(
       'when current: %s, publish beta: %s, should return: %s',
       async (currentVersion, publishBeta, expectedVersion) => {
-        mockCurrentVersion(currentVersion)
-        mockInputs('1', '0', publishBeta)
-        const spy = jest.spyOn(core, 'setOutput')
-        await run()
-        expect(spy).toHaveBeenCalledWith('version', expectedVersion)
+        mockCurrentVersion(currentVersion);
+        mockInputs('1', '0', publishBeta);
+        const spy = jest.spyOn(core, 'setOutput');
+        await run();
+        expect(spy).toHaveBeenCalledWith('version', expectedVersion);
       }
-    )
-  })
+    );
+  });
 
   describe('when current version match the given main or minor version', () => {
     it.each([
@@ -111,12 +120,12 @@ describe('get current version', () => {
     ])(
       'when current: %s, publish beta: %s, should return: %s',
       async (currentVersion, publishBeta, expectedVersion) => {
-        mockCurrentVersion(currentVersion)
-        mockInputs('1', '0', publishBeta)
-        const spy = jest.spyOn(core, 'setOutput')
-        await run()
-        expect(spy).toHaveBeenCalledWith('version', expectedVersion)
+        mockCurrentVersion(currentVersion);
+        mockInputs('1', '0', publishBeta);
+        const spy = jest.spyOn(core, 'setOutput');
+        await run();
+        expect(spy).toHaveBeenCalledWith('version', expectedVersion);
       }
-    )
-  })
-})
+    );
+  });
+});

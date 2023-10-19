@@ -2761,6 +2761,10 @@ async function getCurrentVersion(token) {
         headers: { Authorization: `Bearer ${token}` }
     });
     if (!response.ok) {
+        if (response.status === 404) {
+            console.log('No current version found');
+            return '';
+        }
         throw new Error(`Failed to get current version: ${response.statusText}`);
     }
     const body = await response.json();
@@ -2768,15 +2772,7 @@ async function getCurrentVersion(token) {
         console.log('No current version found');
         return '';
     }
-    if (!body) {
-        console.log('Failed to get current version');
-        return '';
-    }
-    if (!body[0]) {
-        console.log('Failed to get current version');
-        return '';
-    }
-    return body[0].name;
+    return body[0]?.name;
 }
 exports.getCurrentVersion = getCurrentVersion;
 
