@@ -2808,10 +2808,8 @@ function getNextVersion(currentVersion) {
         console.log(`Publish main version from last beta version ${currentVersion}`);
         return currentVersion.split('-beta')[0];
     }
-    else {
-        console.log(`Incrementing patch version from last main version ${currentVersion}`);
-        return incrementPatchVersion(currentVersion);
-    }
+    console.log(`Incrementing patch version from last main version ${currentVersion}`);
+    return incrementPatchVersion(currentVersion);
 }
 exports.getNextVersion = getNextVersion;
 function getNextBetaVersion(currentVersion) {
@@ -2819,11 +2817,9 @@ function getNextBetaVersion(currentVersion) {
         console.log(`Incrementing beta version from last beta version ${currentVersion}`);
         return incrementBetaVersion(currentVersion);
     }
-    else {
-        const nextMainVersion = incrementPatchVersion(currentVersion);
-        console.log(`Incrementing main version to ${nextMainVersion} from ${currentVersion} and adding beta.1`);
-        return `${nextMainVersion}-beta.1`;
-    }
+    const nextMainVersion = incrementPatchVersion(currentVersion);
+    console.log(`Incrementing main version to ${nextMainVersion} from ${currentVersion} and adding beta.1`);
+    return `${nextMainVersion}-beta.1`;
 }
 exports.getNextBetaVersion = getNextBetaVersion;
 
@@ -2903,10 +2899,9 @@ async function run() {
         }
         if (publishBeta) {
             core.setOutput('version', (0, get_next_version_1.getNextBetaVersion)(currentVersion));
+            return;
         }
-        else {
-            core.setOutput('version', (0, get_next_version_1.getNextVersion)(currentVersion));
-        }
+        core.setOutput('version', (0, get_next_version_1.getNextVersion)(currentVersion));
     }
     catch (error) {
         // Fail the workflow run if an error occurs
