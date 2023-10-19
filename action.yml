@@ -14,8 +14,8 @@ inputs:
     description: 'Is beta version'
     required: false
     default: 'false'
-  mainVersion:
-    description: 'Main version'
+  majorVersion:
+    description: 'Major version'
     required: false
     default: '1'
   minorVersion:

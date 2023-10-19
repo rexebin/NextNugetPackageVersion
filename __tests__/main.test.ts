@@ -11,7 +11,7 @@ function mockCurrentVersion(version: string) {
 }
 
 function mockInputs(
-  mainVersion: string,
+  majorVersion: string,
   minorVersion: string,
   publishBeta: string
 ) {
@@ -25,8 +25,8 @@ function mockInputs(
     if (name === 'minorVersion') {
       return minorVersion;
     }
-    if (name === 'mainVersion') {
-      return mainVersion;
+    if (name === 'majorVersion') {
+      return majorVersion;
     }
     if (name === 'publishBeta') {
       return publishBeta;

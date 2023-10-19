@@ -26,7 +26,7 @@ export async function run(): Promise<void> {
       );
     }
     const minorVersion = core.getInput('minorVersion');
-    const mainVersion = core.getInput('mainVersion');
+    const majorVersion = core.getInput('majorVersion');
     const publishBeta: boolean =
       core.getInput('publishBeta').toLowerCase() === 'true';
 
@@ -35,23 +35,23 @@ export async function run(): Promise<void> {
     if (currentVersion === '') {
       console.log(`No current version found`);
       publishBeta
-        ? setFirstBetaVersion(mainVersion, minorVersion)
-        : setFirstVersion(mainVersion, minorVersion);
+        ? setFirstBetaVersion(majorVersion, minorVersion)
+        : setFirstVersion(majorVersion, minorVersion);
       return;
     }
 
     const currentVersionParts = currentVersion.split('.');
 
     if (
-      currentVersionParts[0] !== mainVersion ||
+      currentVersionParts[0] !== majorVersion ||
       currentVersionParts[1] !== minorVersion
     ) {
       console.log(
-        `Current version ${currentVersion} does not match main version ${mainVersion} or minor version ${minorVersion}`
+        `Current version ${currentVersion} does not match main version ${majorVersion} or minor version ${minorVersion}`
       );
       publishBeta
-        ? setFirstBetaVersion(mainVersion, minorVersion)
-        : setFirstVersion(mainVersion, minorVersion);
+        ? setFirstBetaVersion(majorVersion, minorVersion)
+        : setFirstVersion(majorVersion, minorVersion);
       return;
     }
 

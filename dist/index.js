@@ -2878,23 +2878,23 @@ async function run() {
             throw new Error(`GITHUB_TOKEN not set, please set the GITHUB_TOKEN environment variable to secrets.GITHUB_TOKEN`);
         }
         const minorVersion = core.getInput('minorVersion');
-        const mainVersion = core.getInput('mainVersion');
+        const majorVersion = core.getInput('majorVersion');
         const publishBeta = core.getInput('publishBeta').toLowerCase() === 'true';
         const currentVersion = await (0, get_current_version_1.getCurrentVersion)(token);
         if (currentVersion === '') {
             console.log(`No current version found`);
             publishBeta
-                ? setFirstBetaVersion(mainVersion, minorVersion)
-                : setFirstVersion(mainVersion, minorVersion);
+                ? setFirstBetaVersion(majorVersion, minorVersion)
+                : setFirstVersion(majorVersion, minorVersion);
             return;
         }
         const currentVersionParts = currentVersion.split('.');
-        if (currentVersionParts[0] !== mainVersion ||
+        if (currentVersionParts[0] !== majorVersion ||
             currentVersionParts[1] !== minorVersion) {
-            console.log(`Current version ${currentVersion} does not match main version ${mainVersion} or minor version ${minorVersion}`);
+            console.log(`Current version ${currentVersion} does not match main version ${majorVersion} or minor version ${minorVersion}`);
             publishBeta
-                ? setFirstBetaVersion(mainVersion, minorVersion)
-                : setFirstVersion(mainVersion, minorVersion);
+                ? setFirstBetaVersion(majorVersion, minorVersion)
+                : setFirstVersion(majorVersion, minorVersion);
             return;
         }
         if (publishBeta) {
