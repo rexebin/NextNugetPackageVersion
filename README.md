@@ -3,7 +3,7 @@
 [![GitHub Super-Linter](https://github.com/rexebin/next-nuget-package-version/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/rexebin/next-nuget-package-version/actions/workflows/ci.yml/badge.svg)
 
-This github action calls GitHub API `https://api.github.com/orgs/${org}/packages/nuget/${packageName}/versions`
+This GitHub action calls [GitHub API `https://api.github.com/orgs/${org}/packages/nuget/${packageName}/versions`](https://docs.github.com/en/rest/packages/packages?apiVersion=2022-11-28#list-package-versions-for-a-package-owned-by-an-organization)
 with `${{ secrets.GITHUB_TOKEN }}`, to get the latest version and calculate the next version number from inputs such as:
 
 1. main version
