@@ -1,18 +1,15 @@
 import * as core from '@actions/core';
-import { getNextVersion } from './get-next-version';
+import { getNextBetaVersion, getNextVersion } from './get-next-version';
 import { getCurrentVersion } from './get-current-version';
 
-function setFirstVersion(
-  mainVersion: string,
-  minorVersion: string,
-  publishBeta: boolean
-) {
+function setFirstVersion(mainVersion: string, minorVersion: string) {
   const nextVersion = `${mainVersion}.${minorVersion}.0`;
-  if (publishBeta) {
-    core.setOutput('version', `${nextVersion}-beta.1`);
-    return;
-  }
   core.setOutput('version', nextVersion);
+}
+
+function setFirstBetaVersion(mainVersion: string, minorVersion: string) {
+  const nextVersion = `${mainVersion}.${minorVersion}.0`;
+  core.setOutput('version', `${nextVersion}-beta.1`);
 }
 
 /**
@@ -37,7 +34,9 @@ export async function run(): Promise<void> {
 
     if (currentVersion === '') {
       console.log(`No current version found`);
-      setFirstVersion(mainVersion, minorVersion, publishBeta);
+      publishBeta
+        ? setFirstBetaVersion(mainVersion, minorVersion)
+        : setFirstVersion(mainVersion, minorVersion);
       return;
     }
 
@@ -50,12 +49,17 @@ export async function run(): Promise<void> {
       console.log(
         `Current version ${currentVersion} does not match main version ${mainVersion} or minor version ${minorVersion}`
       );
-      setFirstVersion(mainVersion, minorVersion, publishBeta);
+      publishBeta
+        ? setFirstBetaVersion(mainVersion, minorVersion)
+        : setFirstVersion(mainVersion, minorVersion);
       return;
     }
 
-    const nextVersion = getNextVersion(currentVersion, publishBeta);
-    core.setOutput('version', nextVersion);
+    if (publishBeta) {
+      core.setOutput('version', getNextBetaVersion(currentVersion));
+    } else {
+      core.setOutput('version', getNextVersion(currentVersion));
+    }
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message);

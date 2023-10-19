@@ -2785,7 +2785,7 @@ exports.getCurrentVersion = getCurrentVersion;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getNextVersion = void 0;
+exports.getNextBetaVersion = exports.getNextVersion = void 0;
 function incrementBetaVersion(currentVersion) {
     const versionParts = currentVersion.split('-beta.');
     const version = versionParts[0];
@@ -2803,30 +2803,29 @@ function incrementPatchVersion(currentVersion) {
     const nextPatchNumber = patchNumber + 1;
     return `${major}.${minor}.${nextPatchNumber}`;
 }
-function getNextVersion(currentVersion, publishBeta) {
-    if (publishBeta) {
-        if (currentVersion.includes('-beta')) {
-            console.log(`Incrementing beta version from last beta version ${currentVersion}`);
-            return incrementBetaVersion(currentVersion);
-        }
-        else {
-            const nextMainVersion = incrementPatchVersion(currentVersion);
-            console.log(`Incrementing main version to ${nextMainVersion} from ${currentVersion} and adding beta.1`);
-            return `${nextMainVersion}-beta.1`;
-        }
+function getNextVersion(currentVersion) {
+    if (currentVersion.includes('-beta')) {
+        console.log(`Publish main version from last beta version ${currentVersion}`);
+        return currentVersion.split('-beta')[0];
     }
     else {
-        if (currentVersion.includes('-beta')) {
-            console.log(`Publish main version from last beta version ${currentVersion}`);
-            return currentVersion.split('-beta')[0];
-        }
-        else {
-            console.log(`Incrementing patch version from last main version ${currentVersion}`);
-            return incrementPatchVersion(currentVersion);
-        }
+        console.log(`Incrementing patch version from last main version ${currentVersion}`);
+        return incrementPatchVersion(currentVersion);
     }
 }
 exports.getNextVersion = getNextVersion;
+function getNextBetaVersion(currentVersion) {
+    if (currentVersion.includes('-beta')) {
+        console.log(`Incrementing beta version from last beta version ${currentVersion}`);
+        return incrementBetaVersion(currentVersion);
+    }
+    else {
+        const nextMainVersion = incrementPatchVersion(currentVersion);
+        console.log(`Incrementing main version to ${nextMainVersion} from ${currentVersion} and adding beta.1`);
+        return `${nextMainVersion}-beta.1`;
+    }
+}
+exports.getNextBetaVersion = getNextBetaVersion;
 
 
 /***/ }),
@@ -2864,13 +2863,13 @@ exports.run = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const get_next_version_1 = __nccwpck_require__(965);
 const get_current_version_1 = __nccwpck_require__(498);
-function setFirstVersion(mainVersion, minorVersion, publishBeta) {
+function setFirstVersion(mainVersion, minorVersion) {
     const nextVersion = `${mainVersion}.${minorVersion}.0`;
-    if (publishBeta) {
-        core.setOutput('version', `${nextVersion}-beta.1`);
-        return;
-    }
     core.setOutput('version', nextVersion);
+}
+function setFirstBetaVersion(mainVersion, minorVersion) {
+    const nextVersion = `${mainVersion}.${minorVersion}.0`;
+    core.setOutput('version', `${nextVersion}-beta.1`);
 }
 /**
  * The main function for the action.
@@ -2888,18 +2887,26 @@ async function run() {
         const currentVersion = await (0, get_current_version_1.getCurrentVersion)(token);
         if (currentVersion === '') {
             console.log(`No current version found`);
-            setFirstVersion(mainVersion, minorVersion, publishBeta);
+            publishBeta
+                ? setFirstBetaVersion(mainVersion, minorVersion)
+                : setFirstVersion(mainVersion, minorVersion);
             return;
         }
         const currentVersionParts = currentVersion.split('.');
         if (currentVersionParts[0] !== mainVersion ||
             currentVersionParts[1] !== minorVersion) {
             console.log(`Current version ${currentVersion} does not match main version ${mainVersion} or minor version ${minorVersion}`);
-            setFirstVersion(mainVersion, minorVersion, publishBeta);
+            publishBeta
+                ? setFirstBetaVersion(mainVersion, minorVersion)
+                : setFirstVersion(mainVersion, minorVersion);
             return;
         }
-        const nextVersion = (0, get_next_version_1.getNextVersion)(currentVersion, publishBeta);
-        core.setOutput('version', nextVersion);
+        if (publishBeta) {
+            core.setOutput('version', (0, get_next_version_1.getNextBetaVersion)(currentVersion));
+        }
+        else {
+            core.setOutput('version', (0, get_next_version_1.getNextVersion)(currentVersion));
+        }
     }
     catch (error) {
         // Fail the workflow run if an error occurs
