@@ -2755,7 +2755,13 @@ exports.getCurrentVersion = void 0;
 const core = __importStar(__nccwpck_require__(186));
 async function getCurrentVersion(token) {
     const org = core.getInput('org');
+    if (org === '') {
+        throw new Error(`Input org is not set`);
+    }
     const packageName = core.getInput('packageName');
+    if (packageName === '') {
+        throw new Error(`Input packageName is not set`);
+    }
     const response = await fetch(`https://api.github.com/orgs/${org}/packages/nuget/${packageName}/versions`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` }
@@ -2877,7 +2883,13 @@ async function run() {
             throw new Error(`GITHUB_TOKEN not set, please set the GITHUB_TOKEN environment variable to secrets.GITHUB_TOKEN`);
         }
         const minorVersion = core.getInput('minorVersion');
+        if (minorVersion === '') {
+            throw new Error(`Input minorVersion is not set`);
+        }
         const majorVersion = core.getInput('majorVersion');
+        if (majorVersion === '') {
+            throw new Error(`Input majorVersion is not set`);
+        }
         const publishBeta = core.getInput('publishBeta').toLowerCase() === 'true';
         const currentVersion = await (0, get_current_version_1.getCurrentVersion)(token);
         if (currentVersion === '') {

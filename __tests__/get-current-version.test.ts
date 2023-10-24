@@ -3,6 +3,8 @@
  */
 
 import { getCurrentVersion } from '../src/get-current-version';
+// @ts-ignore
+import { mockInputs } from './mock-inputs';
 
 function mockVersion(version: string) {
   jest.spyOn(global, 'fetch').mockResolvedValue({
@@ -18,6 +20,10 @@ afterEach(() => {
 });
 
 describe('get current version', () => {
+  beforeEach(() => {
+    mockInputs('1', '0', 'false');
+  });
+
   it('should return current version', async () => {
     mockVersion('1.0.0');
     const result = await getCurrentVersion('token');

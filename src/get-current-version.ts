@@ -7,7 +7,14 @@ interface GithubPackageVersion {
 
 export async function getCurrentVersion(token: string): Promise<string> {
   const org: string = core.getInput('org');
+  if (org === '') {
+    throw new Error(`Input org is not set`);
+  }
+
   const packageName: string = core.getInput('packageName');
+  if (packageName === '') {
+    throw new Error(`Input packageName is not set`);
+  }
 
   const response: Response = await fetch(
     `https://api.github.com/orgs/${org}/packages/nuget/${packageName}/versions`,

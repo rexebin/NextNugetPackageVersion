@@ -1,5 +1,7 @@
 import { run } from '../src/main';
 import * as core from '@actions/core';
+// @ts-ignore
+import { mockInputs } from './mock-inputs';
 
 function mockCurrentVersion(version: string) {
   jest.spyOn(global, 'fetch').mockResolvedValue({
@@ -9,32 +11,6 @@ function mockCurrentVersion(version: string) {
     ok: true
   } as any as Promise<Response>);
 }
-
-function mockInputs(
-  majorVersion: string,
-  minorVersion: string,
-  publishBeta: string
-) {
-  jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
-    if (name === 'org') {
-      return 'org';
-    }
-    if (name === 'packageName') {
-      return 'packageName';
-    }
-    if (name === 'minorVersion') {
-      return minorVersion;
-    }
-    if (name === 'majorVersion') {
-      return majorVersion;
-    }
-    if (name === 'publishBeta') {
-      return publishBeta;
-    }
-    throw new Error(`Unexpected input ${name}`);
-  });
-}
-
 afterEach(() => {
   jest.restoreAllMocks();
 });
@@ -50,13 +26,49 @@ describe('get current version', () => {
     process.env = OLD_ENV; // Restore old environment
   });
 
-  it('should throw if no token is given', async () => {
-    process.env = { ...OLD_ENV, ...{ GITHUB_TOKEN: undefined } };
-    jest.spyOn(core, 'setFailed');
-    await run();
-    expect(core.setFailed).toHaveBeenCalledWith(
-      'GITHUB_TOKEN not set, please set the GITHUB_TOKEN environment variable to secrets.GITHUB_TOKEN'
-    );
+  describe('inputs should be validated', () => {
+    it('should throw if no token is given', async () => {
+      process.env = { ...OLD_ENV, ...{ GITHUB_TOKEN: undefined } };
+      jest.spyOn(core, 'setFailed');
+      await run();
+      expect(core.setFailed).toHaveBeenCalledWith(
+        'GITHUB_TOKEN not set, please set the GITHUB_TOKEN environment variable to secrets.GITHUB_TOKEN'
+      );
+    });
+
+    it('should throw if no org is given', async () => {
+      mockInputs('1', '0', 'false', '');
+      jest.spyOn(core, 'setFailed');
+      await run();
+      expect(core.setFailed).toHaveBeenCalledWith('Input org is not set');
+    });
+
+    it('should throw if no package name is given', async () => {
+      mockInputs('1', '0', 'false', 'org', '');
+      jest.spyOn(core, 'setFailed');
+      await run();
+      expect(core.setFailed).toHaveBeenCalledWith(
+        'Input packageName is not set'
+      );
+    });
+
+    it('should throw if no major version is given', async () => {
+      mockInputs('', '0', 'false');
+      jest.spyOn(core, 'setFailed');
+      await run();
+      expect(core.setFailed).toHaveBeenCalledWith(
+        'Input majorVersion is not set'
+      );
+    });
+
+    it('should throw if no minor version is given', async () => {
+      mockInputs('1', '', 'false');
+      jest.spyOn(core, 'setFailed');
+      await run();
+      expect(core.setFailed).toHaveBeenCalledWith(
+        'Input minorVersion is not set'
+      );
+    });
   });
 
   describe('when current version is empty', () => {

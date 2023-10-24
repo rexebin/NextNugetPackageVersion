@@ -24,7 +24,15 @@ export async function run(): Promise<void> {
       );
     }
     const minorVersion = core.getInput('minorVersion');
+    if (minorVersion === '') {
+      throw new Error(`Input minorVersion is not set`);
+    }
+
     const majorVersion = core.getInput('majorVersion');
+    if (majorVersion === '') {
+      throw new Error(`Input majorVersion is not set`);
+    }
+
     const publishBeta = core.getInput('publishBeta').toLowerCase() === 'true';
 
     const currentVersion = await getCurrentVersion(token);
